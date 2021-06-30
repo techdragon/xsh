@@ -87,14 +87,20 @@ ln_cmd() {
 #                      the loading time for each unit is printed.
 xsh() {
   # Restrict changes of unexportable global options to local scope.
+  # shellcheck disable=SC2039
   local XSH_SHELLS="${XSH_SHELLS:-$XSHELL}"
+  # shellcheck disable=SC2039
   local XSH_BENCHMARK="${XSH_BENCHMARK}"
+  # shellcheck disable=SC2039
   local XSH_VERBOSE="${XSH_VERBOSE}"
   # Internal local parameters.
   # NOTE: Variables in this scope are exposed to sourced units and are prefixed
   # with '_' to avoid potential conflicts.
+  # shellcheck disable=SC2039
   local _XSH_COMMAND=
+  # shellcheck disable=SC2039
   local _XSH_LOAD_UNITS=
+  # shellcheck disable=SC2039
   local _err=0 _begin= _elapsed=
 
   # Replace 'sh' by 'posix' if it is the current shell.
@@ -136,7 +142,7 @@ xsh() {
 _xsh_run() {
   # Enter zsh posix compatibility mode, mainly for field splitting.
   [ "$ZSH_NAME" ] && emulate -L sh
-
+  # shellcheck disable=SC2039
   local args=
   while [ $# -gt 0 ]; do
     case "$1" in
@@ -190,6 +196,7 @@ _xsh_run() {
 # Globals:
 #   XSH_SHELLS  Used as the list of shells to bootstrap.
 _xsh_bootstrap() {
+  # shellcheck disable=SC2039
   local err=0 sh= rcsh= rc= rcpath=
 
   # Assign the shells as positional parameters.
@@ -246,7 +253,9 @@ _xsh_bootstrap() {
 # Globals:
 #   XSH_SHELLS  Used as the list of shells for which to create the modules.
 _xsh_create() {
+  # shellcheck disable=SC2039
   local mod="$1"
+  # shellcheck disable=SC2039
   local rcs="$2"
   [ ! "$rcs" ] && rcs='interactive'
 
@@ -278,10 +287,12 @@ _xsh_create() {
 # Globals:
 #   XSH_DIR  Used as the base xsh directory to extract documentation.
 _xsh_help() {
+  # shellcheck disable=SC2039
   local func='xsh'
   [ "$1" ] && func="_xsh_$1"
 
   # Sed script that extracts and formats the documentation of a shell function.
+  # shellcheck disable=SC2039
   local prog='
     # On function line, format and print hold space.
     /^'$func'\(\)/ {
@@ -309,6 +320,7 @@ _xsh_help() {
 # Globals:
 #   XSH_SHELLS  Used as the list of shell candidates to lookup for the xsh init file.
 _xsh_init() {
+  # shellcheck disable=SC2039
   local sh="$XSH_SHELLS"
 
   # Reset the internal global state.
@@ -350,7 +362,9 @@ _xsh_list() {
 #   XSH_RUNCOM_PREFIX  Used as the prefix for module runcom files.
 #   XSH_SHELLS         Used as the list of shell candidates to lookup for the module.
 _xsh_load() {
+  # shellcheck disable=SC2039
   local mod="$1"
+  # shellcheck disable=SC2039
   local rc="${2:-${_XSH_RUNCOM:-interactive}}"
 
   if [ ! "$mod" ]; then
@@ -378,7 +392,9 @@ _xsh_load() {
 # Globals:
 #   XSH_SHELLS  Used as the list of shell candidates to lookup for the module.
 _xsh_module() {
+  # shellcheck disable=SC2039
   local mod="$1"
+  # shellcheck disable=SC2039
   local rcs="$2"
   { [ ! "$rcs" ] || [ "$rcs" = '-' ]; } && rcs='env:login:interactive:logout'
 
@@ -422,6 +438,7 @@ _xsh_runcom() {
 #   XSH_CONFIG_DIR     Used as the base directory to find units.
 #   XSH_RUNCOM_PREFIX  Used as the prefix for module runcom files.
 _xsh_load_registered() {
+  # shellcheck disable=SC2039
   local unit= rcs=
 
   # Assign the units as positional parameters.
@@ -457,7 +474,9 @@ _xsh_load_registered() {
 #   XSH_CONFIG_DIR  Used as the base directory to find the unit.
 #   XSH_SHELLS      Used as the list of shell candidates to lookup for the unit.
 _xsh_load_unit() {
+  # shellcheck disable=SC2039
   local unit="$1"
+  # shellcheck disable=SC2039
   local sh= ext= unitpath=
 
   # Assign the shells as positional parameters.
@@ -495,6 +514,7 @@ _xsh_source_unit() {
   # NOTE: Variables in this scope are exposed to sourced units and are prefixed
   # with '_' to avoid potential conflicts.
   # Even if they are modified, there are no dangerous side effects.
+  # shellcheck disable=SC2039
   local _begin= _elapsed= _ext= _err= _errstatus=
   _XSH_LEVEL="$_XSH_LEVEL+"
 
@@ -540,7 +560,9 @@ _xsh_source_unit() {
 # Arguments:
 #   shell  The target shell for the init file to create.
 _xsh_bootstrap_init_file() {
+  # shellcheck disable=SC2039
   local sh="$1"
+  # shellcheck disable=SC2039
   local init= desc=
 
   if [ "$sh" = 'posix' ]; then
@@ -575,7 +597,9 @@ EOF
 # Arguments:
 #   shell  The target shell for the module to create.
 _xsh_bootstrap_module() {
+  # shellcheck disable=SC2039
   local sh="$1"
+  # shellcheck disable=SC2039
   local ext= rc=
 
   [ "$sh" = 'posix' ] && ext='sh' || ext="$sh"
@@ -603,9 +627,13 @@ EOF
 #   module   The name of the module to create.
 #   runcoms  The module runcoms to create.
 _xsh_create_module() {
+  # shellcheck disable=SC2039
   local sh="$1"
+  # shellcheck disable=SC2039
   local mod="$2"
+  # shellcheck disable=SC2039
   local rcs="$3"
+  # shellcheck disable=SC2039
   local ext= rc= rcf=
   [ "$sh" = 'posix' ] && ext='sh' || ext="$sh"
 
@@ -643,8 +671,11 @@ EOF
 #   shell   The shell of the module.
 #   module  The name of the module.
 _xsh_module_header() {
+  # shellcheck disable=SC2039
   local sh="$1"
+  # shellcheck disable=SC2039
   local mod="$2"
+  # shellcheck disable=SC2039
   local sh_desc=
   [ "$sh" != 'posix' ] && sh_desc=" for $sh"
 
@@ -669,8 +700,11 @@ _xsh_log() {
 #   message  The error message to print.
 #   command  The optional command hint. If '-' no tip is printed.
 _xsh_error() {
+  # shellcheck disable=SC2039
   local msg="$1"
+  # shellcheck disable=SC2039
   local cmd="${2-$_XSH_COMMAND}"
+  # shellcheck disable=SC2039
   local hint=1
 
   if [ "$cmd" = '-' ]; then
