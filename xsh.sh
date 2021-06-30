@@ -41,6 +41,24 @@ XSH_DIR="${XSH_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/xsh}"
 XSH_CONFIG_DIR="${XSH_CONFIG_DIR:-$XSH_DIR}"
 XSH_RUNCOM_PREFIX="${XSH_RUNCOM_PREFIX:-@}"
 
+# Command wrappers for cross platform compatibility.
+date_cmd() {
+  __uname_result="$(uname -s)"
+  case "${__uname_result}" in
+    Linux*)     date "$@" ;;
+    Darwin*)    gdate "$@" ;;
+    *)          date "$@"
+  esac
+}
+ln_cmd() {
+  __uname_result="$(uname -s)"
+  case "${__uname_result}" in
+    Linux*)     command ln "$@" ;;
+    Darwin*)    command gln "$@" ;;
+    *)          command ln "$@"
+  esac
+}
+
 # A simple framework for shell configuration management.
 #
 # Usage: xsh [options...] <command> [args...]
@@ -93,7 +111,7 @@ xsh() {
 
   # Begin runcom benchmark.
   if [ "$XSH_BENCHMARK" ] && [ "$_XSH_COMMAND" = 'runcom' ]; then
-    [ "$ZSH_NAME" ] && typeset -F SECONDS=0 || _begin=$(date '+%s%3N')
+    [ "$ZSH_NAME" ] && typeset -F SECONDS=0 || _begin=$(date_cmd '+%s%3N')
   fi
 
   # Source all units marked for loading during xsh execution.
@@ -105,7 +123,7 @@ xsh() {
   if [ "$XSH_BENCHMARK" ] && [ "$_XSH_COMMAND" = 'runcom' ]; then
     [ "$ZSH_NAME" ] \
       && _elapsed="${$(( SECONDS * 1000 ))%.*}" \
-      || _elapsed=$(( $(date +%s%3N) - _begin ))
+      || _elapsed=$(( $(date_cmd +%s%3N) - _begin ))
     _xsh_log "$_XSH_RUNCOM runcom [${_elapsed}ms]"
   fi
 
@@ -205,7 +223,7 @@ _xsh_bootstrap() {
 
       [ "$sh" = 'zsh' ] && rcpath="${ZDOTDIR:-$HOME}" || rcpath="$HOME"
       if [ "$(readlink "$rcpath/.${rc##*/}")" != "$rc" ]; then
-        command ln -vs --backup=numbered "$rc" "$rcpath/.${rc##*/}" || err=1
+        ln_cmd -vs --backup=numbered "$rc" "$rcpath/.${rc##*/}" || err=1
       fi
     done
 
