@@ -1,3 +1,4 @@
 # Ignore all shell configuration directories.
 /*/
 !/runcom/
+.DS_Store
